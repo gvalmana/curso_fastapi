@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 import uvicorn
+from typing import Optional
 
 app = FastAPI()
 
@@ -28,16 +29,22 @@ users = [
 async def message():
     return "Hola mundo"
 
-@app.get('/users')
+@app.get('/users', name= 'List all users')
 async def get_users():
     return users
 
-@app.get('/user/{id}/{edad}')
-async def get_ser(id:int, edad:int):
+@app.get('/user/{id}',name="Get user by id")
+async def get_ser(id:int, edad:int, nombre:Optional[str] = None):
+    if not nombre:
+        print("Nombre no enviado")
     for user in users:
-        if user['id'] == int(id) and user['edad'] == int(edad):
+        if user['id'] == int(id) and user['edad'] == int(edad) and user['nombre'] == nombre:
             return user
     return "User not found"
+
+@app.get('/welcome/{nombre}/{apellido}')
+async def welcome(nombre:str, apellido:str):
+    return f"Bienvenido {nombre} {apellido}"
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host='127.0.0.1', port=3000, reload=True)
